@@ -5,10 +5,3 @@ image = cv.imread("imagenes/prueba.png")
 img_rgb = cv.cvtColor(image,cv.COLOR_BGR2RGB)
 
 print(pt.image_to_string(img_rgb))
-
-
-
-
-
-
-# Prueba de texto: 1, 2, 3
