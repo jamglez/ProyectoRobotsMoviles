@@ -1,2 +1,0 @@
-robot_cartero
--DCATKIN_DEVEL_PREFIX=/home/jamg/ROS/ProyectoRobotsMoviles/devel -DCMAKE_INSTALL_PREFIX=/home/jamg/ROS/ProyectoRobotsMoviles/install -G Unix Makefiles
