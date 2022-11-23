@@ -1,0 +1,8 @@
+prefix=/home/jamg/ROS/ProyectoRobotsMoviles/install
+
+Name: robot_cartero
+Description: Description of robot_cartero
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
