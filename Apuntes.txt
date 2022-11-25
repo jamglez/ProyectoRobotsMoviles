@@ -1,0 +1,7 @@
+Conectarse a la camara: roslaunch astra_launch astra.launch
+Ver la cámara: rqt_image_view
+
+Arm: roslaunch phantomx_reactor_arm_controller arbotix_phantomx_reactor_arm_wrist.launch
+turtlebot_arm_bringup arm.launch
+
+
