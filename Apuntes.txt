@@ -8,3 +8,13 @@ turtlebot_arm_bringup arm.launch
 
 	Para cargar el modelo del mundo guardado en Gazebo, ir al menú de la izquierda de la simulación. En la pestaña "Insert" seleccionar el paquete que corresponda con el del mundo deseado.
 En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Clase2".
+
+
+
+
+
+
+-------------------------- Bibliografía ---------------------
+
+  - Cargar mundo guardado en Gazebo: https://automaticaddison.com/how-to-load-a-robot-model-sdf-format-into-gazebo-ros-2/
+  - Tutorial de SLAM (generar mapa): https://emanual.robotis.com/docs/en/platform/turtlebot3/slam_simulation/
