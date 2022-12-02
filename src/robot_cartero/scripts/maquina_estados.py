@@ -9,7 +9,7 @@ from kobuki_msgs.msg import ButtonEvent
 from std_msgs.msg import String
 
 # define state Foo
-class Reposos(smach.State):
+class Reposo(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
                              outcomes=['outcome1','outcome2'],
@@ -61,10 +61,6 @@ def button_cb(self, data):
     print("Message from button received")
     	
     	
-
-
-
-
 def main():
     rospy.init_node('smach_example_state_machine')
 
@@ -75,7 +71,7 @@ def main():
     # Open the container
     with sm:
         # Add states to the container
-        smach.StateMachine.add('FOO', Foo(), 
+        smach.StateMachine.add('FOO', Reposo(), 
                                transitions={'outcome1':'BAR', 
                                             'outcome2':'outcome4'},
                                remapping={'foo_counter_in':'sm_counter', 
