@@ -231,8 +231,10 @@ class Recogida(smach.State):
         ########################## TODO ##############################
         ############## Sonido, Espera Xs, abre pinza, espera Xs, brazo #######
         
-        userdata.prev_direccion_out = userdata.prev_direccion_in
-        return 'outcome1'
+        if bt0 == True:
+            userdata.prev_direccion_out = userdata.prev_direccion_in
+            bt0 = False
+            return 'outcome1'
 
 
 def main():
