@@ -4,7 +4,7 @@ import rospy
 import smach
 import smach_ros
 from geometry_msgs.msg import Pose
-from kobuki_msgs.msg import ButtonEvent, Led, Sound
+from kobuki_msgs.msg import ButtonEvent
 from std_msgs.msg import String
 import time
 import actionlib
@@ -22,28 +22,15 @@ def button_cb(data):
     bt1 = "1" == data.data
     bt2 = "2" == data.data
     
-# Callback del boton con el laboratorio
-''' 
-def button_cb(data):
-    global bt0, bt1, bt2
-    
-    if data.button == 0:
-        bt0 = True
-    elif data.button == 1:
-        bt1 = True
-    else:
-        bt2 = True
-'''
 
+####################################################### TODO #######################################################
+# Publicar en el nodo de los leds y del sonido
 rospy.Subscriber("/teclas", String, button_cb)
 
-rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
-led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
-led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
-sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)
-arm = rospy.Publisher("/arm", String, queue_size=10)
 
-wait_time = 6
+
+
+wait_time = 1
 
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 
@@ -55,6 +42,9 @@ class Reposo(smach.State):
                              input_keys=['prev_direccion_in'],
                              output_keys=['prev_direccion_out'])
 
+        ######################### TODO ##################################
+        ####### Suscribirse al nodo de la odometría o de la posicion actual
+    
         self.__home_pose = Pose()
 
         self.__home_pose.position.x = 0.0
@@ -68,12 +58,6 @@ class Reposo(smach.State):
     def execute(self, userdata):
         global bt0, bt1, bt2
         print("--- Reposo ---")
-        
-        led1.publish(0)
-        led2.publish(0)
-        sound.publish(0)
-        
-        time.sleep(0.8)
         
         while not rospy.is_shutdown():
             if bt0 == True:
@@ -136,13 +120,9 @@ class Detectar(smach.State):
 
     def execute(self, userdata):
         print("--- Detectando imagen ---")
-        global bt0, bt1, bt2, sound, led1, led2
+        global bt0, bt1, bt2
         
-        led1.publish(1)
-        led2.publish(1)
-        sound.publish(1)
-        
-        time.sleep(0.8)
+        # TODO: luz naranja
         
         while not rospy.is_shutdown():
             if self.__is_dir == True:
@@ -182,11 +162,10 @@ class Img_leida(smach.State):
         
     def execute(self, userdata):
         print("--- Imagen leida ---")
-        global bt0, bt1, bt2, sound
+        global bt0, bt1, bt2
         
-        sound.publish(2)
-        
-        time.sleep(0.8)
+        ################################# TODO ########################
+        ###################### sonido #################################
         
         if bt1 == False:
             userdata.direccion_out = userdata.direccion_in
@@ -204,23 +183,23 @@ class Recoger_carta(smach.State):
                              input_keys=['direccion_in'],
                              output_keys=['direccion_out'])
         
+        ########################## TODO ###########################
+        ########### Suscribirse a topics del brazo ###############
         
     def execute(self, userdata):
         print("--- Recoger carta ---")
-        global bt0, bt1, bt2, arm, led1, led2
+        global bt0, bt1, bt2
         
         time.sleep(wait_time)
-        
         print("------ Cerrar pinza ------")
-        arm.publish("recoger")
-        
+        # TODO: cerrar pinza
         time.sleep(wait_time)
-        
         print("------ Luz verde ------")
-        led1.publish(1)
-        led2.publish(1)
+        # TODO: luz verde
         
-        time.sleep(0.8)
+        ############################# TODO ########################
+        ########## Esperar Xs, cerrar pinza, esperar Xs, luz verde #################
+        ############# Fuera de los ifs ##### y comprobar el boton todo el rato
         
         if bt1 == False:
             userdata.direccion_out = userdata.direccion_in
@@ -246,15 +225,12 @@ class Ir_destino(smach.State):
             self.__prev_pose = data.base_position.pose
     
     def execute(self, userdata):
-        global bt0, bt1, bt2, led1, led2
-        
+        global bt0, bt1, bt2
         print("--- Ir destino ---")
         self.__get_prev_pose = False 
-        
-        led1. publish(1)
-        led2.publish(1)
-        
-        time.sleep(0.8)
+        ########################## TODO ##############################
+        ############## Publicar en el topic de destino de SLAM #######
+        # TODO: luz verde
         
         client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
         
@@ -269,6 +245,7 @@ class Ir_destino(smach.State):
         
         goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
     
+
         client.send_goal(goal, feedback_cb=self.__get_prev_pose_)
         
         client.wait_for_result()
@@ -287,17 +264,21 @@ class Llega_destino(smach.State):
                              output_keys=['prev_direccion_out'])
         
         
+        ##################### TODO ##################################
+        ######### Suscribirse al nodo del brazo #####################
+        
+        
     def execute(self, userdata):
-        global bt0, bt1, bt2, sound, arm
+        global bt0, bt1, bt2
         print("--- Llega destino ---")
         
-        time.sleep(1)
-        
+        ########################## TODO ##############################
+        ############## Espera Xs, sonido, brazo, espera Xs #######
+        time.sleep(wait_time)
         print("------ Sonido ------")
-        sound.publish(1)
-        time.sleep(0.8)
-        
-        arm.publish("soltar")        
+        # Sonido
+        print("------ Extender Brazo ------")
+        # Brazo
         time.sleep(wait_time)
         
         userdata.prev_direccion_out = userdata.prev_direccion_in
@@ -312,14 +293,27 @@ class Recogida(smach.State):
                              output_keys=['prev_direccion_out'])
         
         
+        ##################### TODO ##################################
+        ######### Suscribirse al nodo del brazo #####################
+        
+        
     def execute(self, userdata):
-        global bt0, bt1, bt2, arm
+        global bt0, bt1, bt2
         print("--- Recogida ---")
+        
+        ########################## TODO ##############################
+        ############## Sonido, Espera Xs, abre pinza, espera Xs, brazo #######
+        print("------ Sonido ------")
+        # Sonido
+        time.sleep(wait_time)
+        print("----- Abre pinza ------")
+        # Abre pinza
+        time.sleep(wait_time)
+        print("----- Brazo a reposo ------")
+        # Brazo a reposo
         
         while not rospy.is_shutdown():
             if bt0 == True:
-                arm.publish("abrir")        # Sujeto a cambios
-                
                 userdata.prev_direccion_out = userdata.prev_direccion_in
                 bt0 = False
                 return 'outcome1'
