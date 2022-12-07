@@ -11,8 +11,10 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
 
 
 
+  El mapa está en map_cartas.pgm y map_cartas.yaml en el directorio inicial del turtlebot
 
-
+  El topic del boton es /mobile_base/events/button y el tipo de mensaje es kobuki_msgs/ButtonEvent
+  El topic del led es /mobile_base/commands/led2 y el tipo de mesnake es kobuki_msgs/Led
 
 -------------------------- Bibliografía ---------------------
 
@@ -20,3 +22,5 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
   - Tutorial de SLAM (generar mapa): https://emanual.robotis.com/docs/en/platform/turtlebot3/slam_simulation/
   - Ejemplo de publicar en topic de goal: https://gist.github.com/Coderx7/e190d05a12db87f2bc3bd82c03545d75
   - SMACH: http://wiki.ros.org/smach/Tutorials/Getting%20Started
+
+
