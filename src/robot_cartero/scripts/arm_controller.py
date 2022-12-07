@@ -23,9 +23,19 @@ class arm_controller():
         
     def arm_callback(data,self):
         if data.data == "pick":
-            self.pick()
+            self.gripper_open()
+            self.extend_arm()
+            rospy.sleep(3)
+            self.gripper_close()
+            rospy.sleep(1.5)
+            self.retract_arm()
+            
         elif data.data == "place":
-            self.place()
+            self.extend_arm()
+            rospy.sleep(3)
+            self.gripper_open()
+            rospy.sleep(1)
+            self.retract_arm()
 
     def extend_arm(self):
         self._shoulder.publish(-1)
@@ -43,20 +53,6 @@ class arm_controller():
     def gripper_close(self):
         self._gripper.publish(1.2)
 
-    def pick(self):
-        self.gripper_open()
-        self.extend_arm()
-        rospy.sleep(3)
-        self.gripper_close()
-        rospy.sleep(1.5)
-        self.retract_arm()
-        
-    def place(self):
-        self.extend_arm()
-        rospy.sleep(3)
-        self.gripper_open()
-        rospy.sleep(1)
-        self.retract_arm()
 
 if __name__ == "__main__":
     
