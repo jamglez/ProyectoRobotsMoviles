@@ -13,14 +13,19 @@ class arm_controller():
         rospy.init_node("arm_controller")
 
         # Suscripcion a topics para coger y dejar carta
-        rospy.Subscriber("/arm_controller/pick",String,self.pick_callback)
-        rospy.Subscriber("/arm_controller/place",String,self.pick_callback)
+        rospy.Subscriber("/arm_controller",String,self.arm_callback)
 
         # Publica en topics del control del brazo y pinza
         self._shoulder = rospy.Publisher("/arm_shoulder_pitch_joint/command",Float64,queue_size=10)
         self._elbow = rospy.Publisher("/arm_elbow_pitch_joint/command",Float64,queue_size=10) 
         self._wrist = rospy.Publisher("/arm_wrist_pitch_joint/command",Float64,queue_size=10)
         self._gripper = rospy.Publisher("/arm_gripper_prismatic_joint/command",Float64,queue_size=10)
+        
+    def arm_callback(data,self):
+        if data.data == "pick":
+            self.pick()
+        elif data.data == "place":
+            self.place()
 
     def extend_arm(self):
         self._shoulder.publish(-1)
@@ -38,7 +43,7 @@ class arm_controller():
     def gripper_close(self):
         self._gripper.publish(1.2)
 
-    def pick_callback(self):
+    def pick(self):
         self.gripper_open()
         self.extend_arm()
         rospy.sleep(3)
@@ -46,7 +51,7 @@ class arm_controller():
         rospy.sleep(1.5)
         self.retract_arm()
         
-    def place_callback(self):
+    def place(self):
         self.extend_arm()
         rospy.sleep(3)
         self.gripper_open()
