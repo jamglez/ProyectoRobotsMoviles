@@ -30,7 +30,7 @@ class arm_controller():
             rospy.sleep(1.5)
             self.retract_arm()
             
-        elif data.data == "place":
+        elif data.data == "give":
             self.extend_arm()
             rospy.sleep(3)
             self.gripper_open()
