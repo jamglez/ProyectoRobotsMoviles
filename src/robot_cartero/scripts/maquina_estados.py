@@ -14,16 +14,15 @@ import move_base_msgs.msg
 bt0 = False
 bt1 = False
 bt2 = False
-
+'''
 def button_cb(data):
     global bt0, bt1, bt2
     
     bt0 = "0" == data.data
     bt1 = "1" == data.data
-    bt2 = "2" == data.data
+    bt2 = "2" == data.data'''
     
 # Callback del boton con el laboratorio
-''' 
 def button_cb(data):
     global bt0, bt1, bt2
     
@@ -31,16 +30,15 @@ def button_cb(data):
         bt0 = True
     elif data.button == 1:
         bt1 = True
-    else:
+    elif data.button == 2:
         bt2 = True
-'''
 
 rospy.Subscriber("/teclas", String, button_cb)
-
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
 led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
 sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)
+
 arm = rospy.Publisher("/arm", String, queue_size=10)
 
 wait_time = 6
