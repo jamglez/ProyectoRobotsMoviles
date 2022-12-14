@@ -14,16 +14,17 @@ import move_base_msgs.msg
 bt0 = False
 bt1 = False
 bt2 = False
-'''
+
 def button_cb(data):
     global bt0, bt1, bt2
     
     bt0 = "0" == data.data
     bt1 = "1" == data.data
-    bt2 = "2" == data.data'''
+    bt2 = "2" == data.data
     
 # Callback del boton con el laboratorio
-def button_cb(data):
+
+'''def button_cb(data):
     global bt0, bt1, bt2
     
     if data.button == 0:
@@ -31,7 +32,7 @@ def button_cb(data):
     elif data.button == 1:
         bt1 = True
     elif data.button == 2:
-        bt2 = True
+        bt2 = True'''
 
 rospy.Subscriber("/teclas", String, button_cb)
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
