@@ -21,18 +21,7 @@ def button_cb(data):
     bt0 = "0" == data.data
     bt1 = "1" == data.data
     bt2 = "2" == data.data
-    
-# Callback del boton con el laboratorio
 
-'''def button_cb(data):
-    global bt0, bt1, bt2
-    
-    if data.button == 0:
-        bt0 = True
-    elif data.button == 1:
-        bt1 = True
-    elif data.button == 2:
-        bt2 = True'''
 
 rospy.Subscriber("/teclas", String, button_cb)
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
