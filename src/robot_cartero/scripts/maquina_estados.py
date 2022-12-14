@@ -14,13 +14,7 @@ import move_base_msgs.msg
 bt0 = False
 bt1 = False
 bt2 = False
-'''
-def button_cb(data):
-    global bt0, bt1, bt2
-    
-    bt0 = "0" == data.data
-    bt1 = "1" == data.data
-    bt2 = "2" == data.data'''
+
     
 # Callback del boton con el laboratorio
 def button_cb(data):
