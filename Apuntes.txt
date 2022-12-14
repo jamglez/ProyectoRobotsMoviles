@@ -22,5 +22,11 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
   - Tutorial de SLAM (generar mapa): https://emanual.robotis.com/docs/en/platform/turtlebot3/slam_simulation/
   - Ejemplo de publicar en topic de goal: https://gist.github.com/Coderx7/e190d05a12db87f2bc3bd82c03545d75
   - SMACH: http://wiki.ros.org/smach/Tutorials/Getting%20Started
+  - Generar mundo de Gazebo a partir de PGM: https://github.com/shilohc/map2gazebo
+      pip install --user trimesh
+      pip install --user numpy
+      pip install --user pycollada
+      pip install --user scipy
+      pip install --user networkx
 
 
