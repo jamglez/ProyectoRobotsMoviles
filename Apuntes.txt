@@ -11,8 +11,10 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
 
 
 
+  El mapa está en map_cartas.pgm y map_cartas.yaml en el directorio inicial del turtlebot
 
-
+  El topic del boton es /mobile_base/events/button y el tipo de mensaje es kobuki_msgs/ButtonEvent
+  El topic del led es /mobile_base/commands/led2 y el tipo de mesnake es kobuki_msgs/Led
 
 -------------------------- Bibliografía ---------------------
 
@@ -20,3 +22,55 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
   - Tutorial de SLAM (generar mapa): https://emanual.robotis.com/docs/en/platform/turtlebot3/slam_simulation/
   - Ejemplo de publicar en topic de goal: https://gist.github.com/Coderx7/e190d05a12db87f2bc3bd82c03545d75
   - SMACH: http://wiki.ros.org/smach/Tutorials/Getting%20Started
+  - Generar mundo de Gazebo a partir de PGM: https://github.com/shilohc/map2gazebo
+      pip install --user trimesh
+      pip install --user numpy
+      pip install --user pycollada
+      pip install --user scipy
+      pip install --user networkx
+
+
+
+
+      Posiciones: 
+
+      1           2            3
+            4             5
+
+      1.1:  x: 1.2292635440826416
+            y: 0.9140081405639648
+            z: 0.0
+          orientation: 
+            x: 0.0
+            y: 0.0
+            z: -0.9510824943155826
+            w: 0.30893703081121543
+
+      1.2:  x: 1.220000147819519
+          y: 1.5699999332427979
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.8816742619025034
+          w: 0.47185855497031703
+
+      1.3:  x: -0.2599999010562897
+            y: 2.9499998092651367
+            z: 0.0
+          orientation: 
+            x: 0.0
+            y: 0.0
+            z: -0.9570920278275904
+            w: 0.28978414426754073
+
+      2.1:  x: 1.814220666885376
+            y: 1.9919342994689941
+            z: 0.0
+          orientation: 
+            x: 0.0
+            y: 0.0
+            z: 0.29067248460153594
+            w: 0.9568226098371473
+
+
