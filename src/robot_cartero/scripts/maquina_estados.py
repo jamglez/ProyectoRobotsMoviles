@@ -266,7 +266,7 @@ def main():
                                remapping={'direccion_in':'pose',
                                           'direccion_out':'pose'})
         
-        smach.StateMachine.add('Recoger_carta', Recoger_carta(), 
+        smach.StateMachine.add('Recoger_carta', Recoger_carta(),  
                                transitions={'outcome1':'Ir_destion',
                                             'outcome2':'Reposo'},
                                remapping={'direccion_in':'pose',
