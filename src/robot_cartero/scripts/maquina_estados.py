@@ -27,7 +27,7 @@ def button_cb(data):
     elif data.button == 2:
         bt2 = True
 
-rospy.Subscriber("/teclas", String, button_cb)
+# rospy.Subscriber("/teclas", String, button_cb)
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
 led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
@@ -100,21 +100,21 @@ class Detectar(smach.State):
         for i in range(3):
             self.positions.append(Pose())
         
-        self.positions[0].position.x = 7.04
-        self.positions[0].position.y = 2.18
+        self.positions[0].position.x = 0.925
+        self.positions[0].position.y = 1.848
         
         self.positions[0].orientation.x = 0.0
         self.positions[0].orientation.y = 0.0
-        self.positions[0].orientation.z = -0.707
-        self.positions[0].orientation.w = 0.707
+        self.positions[0].orientation.z = 0.875
+        self.positions[0].orientation.w = 0.484
         
-        self.positions[1].position.x = 5.030003547668457
-        self.positions[1].position.y = 5.539999485015869
+        self.positions[1].position.x = 1.698
+        self.positions[1].position.y = 2.1999
         
         self.positions[1].orientation.x = 0.0
         self.positions[1].orientation.y = 0.0
-        self.positions[1].orientation.z = -0.707
-        self.positions[1].orientation.w = 0.707
+        self.positions[1].orientation.z = 0.461
+        self.positions[1].orientation.w = 0.887
 
         self.positions[2].position.x = 2.0999951362609863
         self.positions[2].position.y = 3.279998540878296
@@ -222,6 +222,27 @@ class Recoger_carta(smach.State):
             return 'outcome2'
 
 
+def enviar(info):
+    client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
+        
+    client.wait_for_server()
+    
+    desiredPose = PoseStamped()
+
+    desiredPose.header.frame_id = "map"
+        # desiredPose.header.seq = 12
+        # desiredPose.header.stamp = rospy.Time.now()
+        
+    desiredPose.pose = info
+        
+    goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
+    print(goal)
+    client.send_goal(goal)
+    while True:
+        pass
+    client.wait_for_result()
+    
+    
 class Ir_destino(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -236,6 +257,8 @@ class Ir_destino(smach.State):
         if self.__get_prev_pose == False:
             self.__get_prev_pose = True
             self.__prev_pose = data.base_position.pose
+
+        
     
     def execute(self, userdata):
         global bt0, bt1, bt2, led1, led2
@@ -248,23 +271,7 @@ class Ir_destino(smach.State):
         
         time.sleep(0.8)
         
-        client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
-        
-        client.wait_for_server()
-    
-        desiredPose = PoseStamped()
-
-        desiredPose.header.frame_id = "map"
-        desiredPose.header.stamp = rospy.Time.now()
-        
-        desiredPose.pose = userdata.direccion_in
-        
-        goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
-    
-        client.send_goal(goal, feedback_cb=self.__get_prev_pose_)
-        
-        client.wait_for_result()
-        
+        enviar(userdata.direccion_in)
         userdata.prev_direccion_out = self.__prev_pose
 
         return 'outcome1'
@@ -373,4 +380,17 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    print("hola")
+    # main()
+    
+    rospy.init_node("a")
+    
+    positions = Pose()
+    positions.position.x = 0.925
+    positions.position.y = 1.848
+        
+    positions.orientation.x = 0.0
+    positions.orientation.y = 0.0
+    positions.orientation.z = 0.875
+    positions.orientation.w = 0.484
+    enviar(positions)
