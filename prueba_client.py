@@ -32,13 +32,13 @@ def fibonacci_client():
     desiredPose.header.frame_id = "map"
     desiredPose.header.stamp = rospy.Time.now()
     
-    desiredPose.pose.position.x = 4.8135480880737305#Convert distance and angle to waypoint from Polar to Cartesian co-ordinates then add current position of robot odometry 
-    desiredPose.pose.position.y = 5.377022743225098
+    desiredPose.pose.position.x = 0.9258#Convert distance and angle to waypoint from Polar to Cartesian co-ordinates then add current position of robot odometry 
+    desiredPose.pose.position.y = 1.848
     desiredPose.pose.position.z = 0.0 #Assuming CurrPosZ is abslolute (eg barometer or GPS)
     desiredPose.pose.orientation.x = 0
     desiredPose.pose.orientation.y = 0
-    desiredPose.pose.orientation.z = 0.4767427044570244
-    desiredPose.pose.orientation.w = 0.8790428850442976    
+    desiredPose.pose.orientation.z = 0.874
+    desiredPose.pose.orientation.w = 0.484    
     
     
     desiredPose2 = PoseStamped()

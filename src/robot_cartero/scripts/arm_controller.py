@@ -3,7 +3,7 @@
 import rospy
 from std_msgs.msg import Float64
 from std_msgs.msg import String
-
+import time
 
 class arm_controller():
 
@@ -21,16 +21,16 @@ class arm_controller():
         self._wrist = rospy.Publisher("/arm_wrist_pitch_joint/command",Float64,queue_size=10)
         self._gripper = rospy.Publisher("/arm_gripper_prismatic_joint/command",Float64,queue_size=10)
         
-    def arm_callback(data,self):
-        if data.data == "pick":
+    def arm_callback(self,data):
+        if data.data == "recoger":
             self.gripper_open()
             self.extend_arm()
-            rospy.sleep(3)
+            time.sleep(6)
             self.gripper_close()
-            rospy.sleep(1.5)
+            time.sleep(3)
             self.retract_arm()
             
-        elif data.data == "give":
+        elif data.data == "soltar":
             self.extend_arm()
             rospy.sleep(3)
             self.gripper_open()
@@ -40,12 +40,12 @@ class arm_controller():
     def extend_arm(self):
         self._shoulder.publish(-1)
         self._elbow.publish(0.8)
-        self._wrist.publish(-0.5)
+        self._wrist.publish(-1)
 
     def retract_arm(self):
         self._shoulder.publish(-1.5)
-        self._elbow.publish(0)
-        self._wrist.publish(0)
+        self._elbow.publish(-0.8)
+        self._wrist.publish(-0.0)
 
     def gripper_open(self):
         self._gripper.publish(0)
