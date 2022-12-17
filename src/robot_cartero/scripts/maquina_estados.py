@@ -222,26 +222,6 @@ class Recoger_carta(smach.State):
             return 'outcome2'
 
 
-def enviar(info):
-    client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
-        
-    client.wait_for_server()
-    
-    desiredPose = PoseStamped()
-
-    desiredPose.header.frame_id = "map"
-        # desiredPose.header.seq = 12
-        # desiredPose.header.stamp = rospy.Time.now()
-        
-    desiredPose.pose = info
-        
-    goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
-    print(goal)
-    client.send_goal(goal)
-    while True:
-        pass
-    client.wait_for_result()
-    
     
 class Ir_destino(smach.State):
     def __init__(self):
@@ -250,14 +230,15 @@ class Ir_destino(smach.State):
                              input_keys=['direccion_in'],
                              output_keys=['prev_direccion_out'])
         
+        self.__go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
+        rospy.Subscriber("/arrive", Pose, self.__get_prev_pose_)
+        
         self.__prev_pose = Pose()
         self.__get_prev_pose = False
         
     def __get_prev_pose_(self, data):
-        if self.__get_prev_pose == False:
-            self.__get_prev_pose = True
-            self.__prev_pose = data.base_position.pose
-
+        self.__prev_pose = data.pose
+        self.__get_prev_pose = True
         
     
     def execute(self, userdata):
@@ -270,8 +251,39 @@ class Ir_destino(smach.State):
         led2.publish(1)
         
         time.sleep(0.8)
+        '''
+        client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
         
-        enviar(userdata.direccion_in)
+        client.wait_for_server()
+        
+        desiredPose = PoseStamped()
+
+        desiredPose.header.frame_id = "map"
+            # desiredPose.header.seq = 12
+            # desiredPose.header.stamp = rospy.Time.now()
+            
+        desiredPose.pose = userdata.direccion_in
+            
+        goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
+        print(goal)
+        client.send_goal(goal)
+
+        client.wait_for_result()'''
+        
+        desiredPose = PoseStamped()
+
+        desiredPose.header.frame_id = "map"
+        # desiredPose.header.seq = 12
+        # desiredPose.header.stamp = rospy.Time.now()
+            
+        desiredPose.pose = userdata.direccion_in
+        
+        self.__go_pose_pub.publish(desiredPose)
+        
+        while not self.__get_prev_pose:
+            pass
+        
+        
         userdata.prev_direccion_out = self.__prev_pose
 
         return 'outcome1'
@@ -381,16 +393,4 @@ def main():
 
 if __name__ == '__main__':
     print("hola")
-    # main()
-    
-    rospy.init_node("a")
-    
-    positions = Pose()
-    positions.position.x = 0.925
-    positions.position.y = 1.848
-        
-    positions.orientation.x = 0.0
-    positions.orientation.y = 0.0
-    positions.orientation.z = 0.875
-    positions.orientation.w = 0.484
-    enviar(positions)
+    main()
