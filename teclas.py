@@ -8,7 +8,9 @@ rospy.init_node("teclas")
 pub = rospy.Publisher("/teclas", String, queue_size=10)
 
 def callback(tecla):
+    global pub
     s = String()
+    
         
     if(str(tecla) == "'0'"):
         s.data = "0"
