@@ -2,7 +2,7 @@
 
 import rospy
 import smach
-import smach_ros
+from smach_ros import SimpleActionState
 from geometry_msgs.msg import Pose
 from kobuki_msgs.msg import ButtonEvent, Led, Sound
 from std_msgs.msg import String
@@ -17,7 +17,7 @@ bt2 = False
 
     
 # Callback del boton con el laboratorio
-def button_cb(data):
+'''def button_cb(data):
     global bt0, bt1, bt2
     
     if data.button == 0:
@@ -25,19 +25,30 @@ def button_cb(data):
     elif data.button == 1:
         bt1 = True
     elif data.button == 2:
-        bt2 = True
+        bt2 = True'''
+        
+def button_cb(data):
+    global bt0, bt1, bt2
 
-# rospy.Subscriber("/teclas", String, button_cb)
-rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
+    if data.data == "0":
+        bt0 = True
+    elif data.data == "1":
+        bt1 = True
+    elif data.data == "2":
+        bt2 = True
+    
+go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
+rospy.Subscriber("/teclas", String, button_cb)
+# rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
 led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
 sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)
 
 arm = rospy.Publisher("/arm", String, queue_size=10)
 
-wait_time = 6
+wait_time = 1
 
-rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
+# rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 
 
 class Reposo(smach.State):
@@ -130,17 +141,16 @@ class Detectar(smach.State):
         print("--- Detectando imagen ---")
         global bt0, bt1, bt2, sound, led1, led2
         
-        led1.publish(1)
-        led2.publish(1)
+        led1.publish(2)
+        led2.publish(2)
         sound.publish(1)
         
         time.sleep(0.8)
         
         while not rospy.is_shutdown():
             if self.__is_dir == True:
-                print("is_dir")
-                userdata.direccion_out = self.__pose
-            	
+
+                userdata.direccion_out = self.__pose            	
                 self.__is_dir = False
 		        
                 return 'outcome1'
@@ -209,8 +219,8 @@ class Recoger_carta(smach.State):
         time.sleep(wait_time)
         
         print("------ Luz verde ------")
-        led1.publish(1)
-        led2.publish(1)
+        led1.publish(2)
+        led2.publish(2)
         
         time.sleep(0.8)
         
@@ -222,6 +232,7 @@ class Recoger_carta(smach.State):
             return 'outcome2'
 
 
+
     
 class Ir_destino(smach.State):
     def __init__(self):
@@ -230,19 +241,19 @@ class Ir_destino(smach.State):
                              input_keys=['direccion_in'],
                              output_keys=['prev_direccion_out'])
         
-        self.__go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
+        
         rospy.Subscriber("/arrive", Pose, self.__get_prev_pose_)
         
         self.__prev_pose = Pose()
         self.__get_prev_pose = False
         
     def __get_prev_pose_(self, data):
-        self.__prev_pose = data.pose
+        self.__prev_pose = data
         self.__get_prev_pose = True
         
     
     def execute(self, userdata):
-        global bt0, bt1, bt2, led1, led2
+        global bt0, bt1, bt2, led1, led2, go_pose
         
         print("--- Ir destino ---")
         self.__get_prev_pose = False 
@@ -278,7 +289,7 @@ class Ir_destino(smach.State):
             
         desiredPose.pose = userdata.direccion_in
         
-        self.__go_pose_pub.publish(desiredPose)
+        go_pose_pub.publish(desiredPose)
         
         while not self.__get_prev_pose:
             pass
@@ -308,9 +319,6 @@ class Llega_destino(smach.State):
         sound.publish(1)
         time.sleep(0.8)
         
-        arm.publish("soltar")        
-        time.sleep(wait_time)
-        
         userdata.prev_direccion_out = userdata.prev_direccion_in
         return 'outcome1'
 
@@ -329,8 +337,11 @@ class Recogida(smach.State):
         
         while not rospy.is_shutdown():
             if bt0 == True:
-                arm.publish("abrir")        # Sujeto a cambios
                 
+                time.sleep(wait_time/2)
+                arm.publish("soltar")       # Sujeto a cambios
+                time.sleep(wait_time)
+
                 userdata.prev_direccion_out = userdata.prev_direccion_in
                 bt0 = False
                 return 'outcome1'
@@ -341,7 +352,7 @@ def main():
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['outcome4'])
-    
+
     sm.userdata.pose = Pose()
 
     # Open the container
@@ -375,7 +386,7 @@ def main():
                                transitions={'outcome1':'Llega_destino'},
                                remapping={'direccion_in':'pose',
                                           'prev_direccion_out':'pose'})
-
+        
         smach.StateMachine.add('Llega_destino', Llega_destino(), 
                                transitions={'outcome1':'Recogida'},
                                remapping={'prev_direccion_in':'pose',
