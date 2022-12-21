@@ -24,17 +24,15 @@ def go_pose(data):
     client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
     
     client.wait_for_server()
-    
-    desiredPose = PoseStamped()
-
-    desiredPose.header.frame_id = "map"
 
     goal = move_base_msgs.msg.MoveBaseGoal(data)
     print(goal)
     
     client.send_goal(goal, feedback_cb=cb)
     client.wait_for_result()
+    
     pub.publish(prev_pose)
+    
     prev_pose = Pose()
     get_prev_pose = False
     
