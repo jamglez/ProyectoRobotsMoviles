@@ -1,0 +1,10 @@
+<launch>
+    <arg name="mode" default="camera" />
+
+    <node name="state_machine" pkg="robot_cartero" type="maquina_estados.py" output="screen" />
+    <node name="go_dest" pkg="robot_cartero" type="go_dest.py" output="screen" />
+    
+    <group if="$(eval arg('mode') == 'tiles')">
+        <node name="tiles" pkg="robot_cartero" type="teclas.py" output="screen" />
+    </group>
+</launch>
