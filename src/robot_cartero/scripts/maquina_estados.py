@@ -37,13 +37,13 @@ def button_cb(data):
     elif data.data == "2":
         bt2 = True
     
-go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
+
 rospy.Subscriber("/teclas", String, button_cb)
 # rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
 led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
 sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)
-
+go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
 arm = rospy.Publisher("/arm", String, queue_size=10)
 
 wait_time = 1
@@ -101,7 +101,8 @@ class Detectar(smach.State):
                              outcomes=['outcome1','outcome2'],
                              output_keys=['direccion_out'])
         
-        rospy.Subscriber("/teclas", String, self.__camera_cb)
+        # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
+        rospy.Subscriber("/teclas", String, self.__camera_cb)      
                 
         self.__pose = Pose()
 
@@ -138,7 +139,7 @@ class Detectar(smach.State):
         
 
     def execute(self, userdata):
-        print("--- Detectando imagen ---")
+        print("------ Detectando imagen ------")
         global bt0, bt1, bt2, sound, led1, led2
         
         led1.publish(2)
@@ -232,7 +233,6 @@ class Recoger_carta(smach.State):
             return 'outcome2'
 
 
-
     
 class Ir_destino(smach.State):
     def __init__(self):
@@ -255,38 +255,16 @@ class Ir_destino(smach.State):
     def execute(self, userdata):
         global bt0, bt1, bt2, led1, led2, go_pose
         
-        print("--- Ir destino ---")
+        print("------ Ir destino ------")
         self.__get_prev_pose = False 
         
         led1. publish(1)
         led2.publish(1)
         
         time.sleep(0.8)
-        '''
-        client = actionlib.SimpleActionClient('move_base', move_base_msgs.msg.MoveBaseAction)
-        
-        client.wait_for_server()
         
         desiredPose = PoseStamped()
-
         desiredPose.header.frame_id = "map"
-            # desiredPose.header.seq = 12
-            # desiredPose.header.stamp = rospy.Time.now()
-            
-        desiredPose.pose = userdata.direccion_in
-            
-        goal = move_base_msgs.msg.MoveBaseGoal(desiredPose)
-        print(goal)
-        client.send_goal(goal)
-
-        client.wait_for_result()'''
-        
-        desiredPose = PoseStamped()
-
-        desiredPose.header.frame_id = "map"
-        # desiredPose.header.seq = 12
-        # desiredPose.header.stamp = rospy.Time.now()
-            
         desiredPose.pose = userdata.direccion_in
         
         go_pose_pub.publish(desiredPose)
@@ -311,7 +289,7 @@ class Llega_destino(smach.State):
         
     def execute(self, userdata):
         global bt0, bt1, bt2, sound, arm
-        print("--- Llega destino ---")
+        print("------ Llega destino ------")
         
         time.sleep(1)
         
@@ -403,5 +381,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print("hola")
     main()
