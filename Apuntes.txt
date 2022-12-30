@@ -29,8 +29,12 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
       pip install --user scipy
       pip install --user networkx
 
-
-
+  - Instalaciones:
+    sudo apt-get install ros-noetic-ecl-exceptions
+    sudo apt-get install ros-noetic-ecl-threads
+    sudo apt-get install ros-noetic-openslam-gmapping
+    sudo apt-get install ros-noetic-joy
+    sudo apt-get install ros-noetic-kobuki-driver
 
       Posiciones: 
 
