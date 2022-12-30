@@ -11,13 +11,14 @@ import actionlib
 from geometry_msgs.msg import PoseStamped
 import move_base_msgs.msg
 
+# Variables para los botones
 bt0 = False
 bt1 = False
 bt2 = False
 
     
 # Callback del boton con el laboratorio
-'''def button_cb(data):
+def button_cb(data):
     global bt0, bt1, bt2
     
     if data.button == 0:
@@ -25,32 +26,21 @@ bt2 = False
     elif data.button == 1:
         bt1 = True
     elif data.button == 2:
-        bt2 = True'''
-        
-def button_cb(data):
-    global bt0, bt1, bt2
-
-    if data.data == "0":
-        bt0 = True
-    elif data.data == "1":
-        bt1 = True
-    elif data.data == "2":
         bt2 = True
     
+# Publishers y subscribers de los elementos del botón
+rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)          # Subscriber de los botones
+led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)        # Publishers de los leds
+led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)        
+sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)    # Publisher del sonido
+go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)           # Publisher para el nodo de /go_pose
+arm = rospy.Publisher("/arm", String, queue_size=10)                            # Publisher para el nodo del brazo
 
-rospy.Subscriber("/teclas", String, button_cb)
-# rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
-led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)
-led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)
-sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)
-go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)
-arm = rospy.Publisher("/arm", String, queue_size=10)
-
+# Tiempo de espera
 wait_time = 1
 
-# rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)
 
-
+# Reposo
 class Reposo(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -58,6 +48,7 @@ class Reposo(smach.State):
                              input_keys=['prev_direccion_in'],
                              output_keys=['prev_direccion_out'])
 
+        # Posición de Home
         self.__home_pose = Pose()
 
         self.__home_pose.position.x = 0.0
@@ -68,16 +59,19 @@ class Reposo(smach.State):
         self.__home_pose.orientation.z = 0.0
         self.__home_pose.orientation.w = 1
             
+
     def execute(self, userdata):
         global bt0, bt1, bt2
         print("--- Reposo ---")
         
+        # Apagar los leds y hacer sonido
         led1.publish(0)
         led2.publish(0)
         sound.publish(0)
         
         time.sleep(0.8)
         
+        # Espera a que se pulse uno de los botones para cambiar de estado
         while not rospy.is_shutdown():
             if bt0 == True:
                 bt0 = False
@@ -95,6 +89,7 @@ class Reposo(smach.State):
 
 
 
+# Detectar imágenes
 class Detectar(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -103,11 +98,14 @@ class Detectar(smach.State):
         
         # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
         rospy.Subscriber("/teclas", String, self.__camera_cb)      
-                
+        
+        # Mensaje de Pose
         self.__pose = Pose()
 
+        # Flag para indicar si se recibió una dirección
         self.__is_dir = False
         
+        # Lista de direcciones
         self.positions = []
         for i in range(3):
             self.positions.append(Pose())
@@ -142,15 +140,18 @@ class Detectar(smach.State):
         print("------ Detectando imagen ------")
         global bt0, bt1, bt2, sound, led1, led2
         
+        # Enciende leds en naranja y emite sonido
         led1.publish(2)
         led2.publish(2)
         sound.publish(1)
         
         time.sleep(0.8)
         
+        # Hasta que detecte una imagen o se pulse el botón no cambia de estado
         while not rospy.is_shutdown():
             if self.__is_dir == True:
-
+                
+                # Se pasa la dirección al siguiente estado
                 userdata.direccion_out = self.__pose            	
                 self.__is_dir = False
 		        
@@ -159,7 +160,8 @@ class Detectar(smach.State):
             elif bt1 == True:
                 bt1 = False
                 return 'outcome2'
-            
+    
+    # Callback de la cámara
     def __camera_cb(self, data):        
         if data.data == "a":
             self.__pose = self.positions[0]
@@ -175,6 +177,7 @@ class Detectar(smach.State):
 
     
 
+# Image leída 
 class Img_leida(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -183,14 +186,17 @@ class Img_leida(smach.State):
                              input_keys=['direccion_in'],
                              output_keys=['direccion_out'])
         
+
     def execute(self, userdata):
         print("--- Imagen leida ---")
         global bt0, bt1, bt2, sound
         
+        # Sonido
         sound.publish(2)
         
         time.sleep(0.8)
         
+        # Pasa la dirección si no se pulsó el botón 1
         if bt1 == False:
             userdata.direccion_out = userdata.direccion_in
    
@@ -199,6 +205,8 @@ class Img_leida(smach.State):
             return 'outcome2'
 
 
+
+# Recoger la carta
 class Recoger_carta(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -212,6 +220,7 @@ class Recoger_carta(smach.State):
         print("--- Recoger carta ---")
         global bt0, bt1, bt2, arm, led1, led2
         
+        # Espera unos segundos y publica en el nodo de la pinza para recoger la carta
         time.sleep(wait_time)
         
         print("------ Cerrar pinza ------")
@@ -219,12 +228,14 @@ class Recoger_carta(smach.State):
         
         time.sleep(wait_time)
         
+        # Enciende los leds en verde
         print("------ Luz verde ------")
         led1.publish(2)
         led2.publish(2)
         
         time.sleep(0.8)
         
+        # Pasa la dirección al siguiente estado si no se pulsa el botón 1
         if bt1 == False:
             userdata.direccion_out = userdata.direccion_in
             return 'outcome1'
@@ -234,6 +245,7 @@ class Recoger_carta(smach.State):
 
 
     
+# Ir al destino
 class Ir_destino(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -241,12 +253,14 @@ class Ir_destino(smach.State):
                              input_keys=['direccion_in'],
                              output_keys=['prev_direccion_out'])
         
-        
+        # Suscribirse al topic de la posición de inicio de movimiento
         rospy.Subscriber("/arrive", Pose, self.__get_prev_pose_)
         
+        # Pose anterior al movimiento y flag para indicar cuando se recibe
         self.__prev_pose = Pose()
         self.__get_prev_pose = False
         
+    # Callback para cuando se reciba la posición anterior
     def __get_prev_pose_(self, data):
         self.__prev_pose = data
         self.__get_prev_pose = True
@@ -254,31 +268,36 @@ class Ir_destino(smach.State):
     
     def execute(self, userdata):
         global bt0, bt1, bt2, led1, led2, go_pose
-        
+    
         print("------ Ir destino ------")
         self.__get_prev_pose = False 
-        
+
+        # Enciende los leds en naranja        
         led1. publish(1)
         led2.publish(1)
         
         time.sleep(0.8)
         
+        # Crea el mensaje
         desiredPose = PoseStamped()
         desiredPose.header.frame_id = "map"
         desiredPose.pose = userdata.direccion_in
         
+        # Publica el mensaje
         go_pose_pub.publish(desiredPose)
         
+        # Mientras no reciba el mensaje de que ha llegado al objetivo espera
         while not self.__get_prev_pose:
             pass
         
-        
+        # Pasa la posición anterior al movimiento al siguiente estado
         userdata.prev_direccion_out = self.__prev_pose
 
         return 'outcome1'
     
             
 
+# Llega al destino
 class Llega_destino(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -293,14 +312,19 @@ class Llega_destino(smach.State):
         
         time.sleep(1)
         
+        # Sonido
         print("------ Sonido ------")
         sound.publish(1)
         time.sleep(0.8)
         
+        # Pasa la posición anterior al movimiento al siguiente estado
         userdata.prev_direccion_out = userdata.prev_direccion_in
+
         return 'outcome1'
 
 
+
+# Recogida
 class Recogida(smach.State):
     def __init__(self):
         smach.State.__init__(self, 
@@ -313,29 +337,39 @@ class Recogida(smach.State):
         global bt0, bt1, bt2, arm
         print("--- Recogida ---")
         
+        # Bucle mientras espera la pulsación del botón
         while not rospy.is_shutdown():
             if bt0 == True:
                 
+                # Publica el mensaje soltar 
                 time.sleep(wait_time/2)
                 arm.publish("soltar")       # Sujeto a cambios
                 time.sleep(wait_time)
 
+                # Pasa la posición anterior al movimiento al siguiente estado
                 userdata.prev_direccion_out = userdata.prev_direccion_in
+
                 bt0 = False
+                
                 return 'outcome1'
 
 
+
+# Función para el main
 def main():
+    
+    # Nodo
     rospy.init_node('smach_example_state_machine')
 
-    # Create a SMACH state machine
+    # Máquina de estados
     sm = smach.StateMachine(outcomes=['outcome4'])
 
+    # Los mensajes entre estados son de tipo Pose
     sm.userdata.pose = Pose()
 
-    # Open the container
     with sm:
-        # Add states to the container
+        
+        # Añade los estados 
         smach.StateMachine.add('Reposo', Reposo(), 
                                transitions={'outcome1':'Detectar', 
                                             'outcome2':'Recoger_carta',
@@ -376,9 +410,6 @@ def main():
                                           'prev_direccion_out':'pose'})
 
 
-    # Execute SMACH plan
-    outcome = sm.execute()
-
-
+# Main
 if __name__ == '__main__':
     main()
