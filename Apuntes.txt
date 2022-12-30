@@ -35,6 +35,7 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
     sudo apt-get install ros-noetic-openslam-gmapping
     sudo apt-get install ros-noetic-joy
     sudo apt-get install ros-noetic-kobuki-driver
+    sudo apt-get install ros-noetic-ecl-streams
 
       Posiciones: 
 
