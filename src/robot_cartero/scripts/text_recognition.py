@@ -28,6 +28,7 @@ class text_recognizer():
         self.__text_pub = rospy.Publisher("/text_rec", String, queue_size=10)
         rospy.Subscriber("/text_rec_start", String, self.__start_cb)
         self.__rec = False
+        self.destroy = False
         
 
     # Comprueba el numero de mesa durante varios frames
@@ -42,6 +43,7 @@ class text_recognizer():
 
     def __start_cb(self, data):
         self.__rec = data.data == "start"
+        self.destroy = True
 
     def webcam_test(self):
         
@@ -54,7 +56,7 @@ class text_recognizer():
 
         while(True):
             
-            if self.__rec:
+            if True:
                 ret, frame_ = cap.read()
             
                 if ret :
@@ -86,7 +88,9 @@ class text_recognizer():
                     cv.imshow('frame', frame)
                     cv.waitKey(1)
             else:
-                cv.destroyAllWindows()
+                if self.destroy:
+                    cv.destroyAllWindows()
+                    self.destroy = False
         
         fps.stop()
         print(f"[INFO] elapsed time {round(fps.elapsed(), 2)}")
