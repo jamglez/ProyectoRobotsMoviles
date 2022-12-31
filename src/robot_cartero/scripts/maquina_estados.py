@@ -55,11 +55,6 @@ class Reposo(smach.State):
         global bt0, bt1, bt2
         print("--- Reposo ---")
         
-        # Se apagan los leds y hace un sonido
-        led1.publish(0)
-        led2.publish(0)
-        sound.publish(0)
-        
         time.sleep(0.8)
         
         # Pasará al siguiente estado según pulsaciones del botón
@@ -98,44 +93,47 @@ class Detectar(smach.State):
         
         # Lista de posiciones pre - definidas
         self.positions = []
-        for i in range(3):
+
+        for i in range(22):
             self.positions.append(Pose())
         
-        self.positions[0].position.x = 0.925
-        self.positions[0].position.y = 1.848
-        
-        self.positions[0].orientation.x = 0.0
-        self.positions[0].orientation.y = 0.0
-        self.positions[0].orientation.z = 0.875
-        self.positions[0].orientation.w = 0.484
-        
-        self.positions[1].position.x = 1.698
-        self.positions[1].position.y = 2.1999
-        
-        self.positions[1].orientation.x = 0.0
-        self.positions[1].orientation.y = 0.0
-        self.positions[1].orientation.z = 0.461
-        self.positions[1].orientation.w = 0.887
+        self.positions[0].position.x = 5.33
+        self.positions[0].position.y = 6
+        self.positions[0].orientation.z = 0
+        self.positions[0].orientation.w = 1
 
-        self.positions[2].position.x = 2.0999951362609863
-        self.positions[2].position.y = 3.279998540878296
-        
-        self.positions[2].orientation.x = 0.0
-        self.positions[2].orientation.y = 0.0
-        self.positions[2].orientation.z = -0.998
-        self.positions[2].orientation.w = 0.05
-        
+        self.positions[1].position.x = 5.019
+        self.positions[1].position.y = 5.5
+        self.positions[1].orientation.z = -0.707
+        self.positions[1].orientation.w = 0.707
+
+        self.positions[2].position.x = 5.07
+        self.positions[2].position.y = 3.77
+        self.positions[2].orientation.z = 0
+        self.positions[2].orientation.w = 1
+
+        self.positions[3].position.x = 4.62
+        self.positions[3].position.y = 5.4
+        self.positions[3].orientation.z = 0.707
+        self.positions[3].orientation.w = 0.707
+
+        self.positions[4].position.x = 2.84
+        self.positions[4].position.y = 5.18
+        self.positions[4].orientation.z = 0.0
+        self.positions[4].orientation.w = 1
+
+        # F
+        self.positions[5].position.x = 2.47
+        self.positions[5].position.y = 5.73
+        self.positions[5].orientation.z = 0.707
+        self.positions[5].orientation.w = 0.707        
 
     def execute(self, userdata):
         print("------ Detectando imagen ------")
         global bt0, bt1, bt2, sound, led1, led2
         
         self.__is_dir = False
-
-        # Se ponen los leds en naranja (está detectando) y se emite sonido
-        led1.publish(2)
-        led2.publish(2)
-        sound.publish(1)
+        
         
         time.sleep(0.8)
         
@@ -183,9 +181,7 @@ class Img_leida(smach.State):
     def execute(self, userdata):
         print("--- Imagen leida ---")
         global bt0, bt1, bt2, sound
-        
-        sound.publish(2)
-        
+                
         time.sleep(0.8)
         
         if bt1 == False:
@@ -218,11 +214,6 @@ class Recoger_carta(smach.State):
         print("------ Cerrar pinza ------")
         arm.publish("recoger")
         time.sleep(wait_time)
-        
-        # Se encienden los leds en verde (va a iniciar el movimiento)
-        print("------ Luz verde ------")
-        led1.publish(2)
-        led2.publish(2)
         
         time.sleep(0.8)
         
@@ -262,10 +253,6 @@ class Ir_destino(smach.State):
         
         print("------ Ir destino ------")
         self.__get_prev_pose = False 
-
-        # Se encienden leds naranjas    
-        led1. publish(1)
-        led2.publish(1)
         
         time.sleep(0.8)
         
@@ -301,11 +288,6 @@ class Llega_destino(smach.State):
         print("------ Llega destino ------")
         
         time.sleep(1)
-        
-        # Emite sonido
-        print("------ Sonido ------")
-        sound.publish(1)
-        time.sleep(0.8)
         
         # Se pasa la posición anterior al movimiento
         userdata.prev_direccion_out = userdata.prev_direccion_in
@@ -392,7 +374,7 @@ def main():
                                remapping={'prev_direccion_in':'pose',
                                           'prev_direccion_out':'pose'})
 
-
+    outcome = sm.execute()
 
 if __name__ == '__main__':
     main()
