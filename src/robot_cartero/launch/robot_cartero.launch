@@ -1,0 +1,7 @@
+<launch>
+    <node name="text_recognizer" pkg="robot_cartero" type="text_recognition.py" output="screen"/>
+    <node name="maquina_estados" pkg="robot_cartero" type="maquina_estados.py" output="screen" />
+    <node name="go_dest" pkg="robot_cartero" type="go_dest.py" output="screen" />
+    <node name="teclas" pkg="robot_cartero" type="teclas.py" output="screen" />
+
+</launch>
