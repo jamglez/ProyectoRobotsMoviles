@@ -83,8 +83,10 @@ class Detectar(smach.State):
                              output_keys=['direccion_out'])
         
         # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
-        rospy.Subscriber("/teclas", String, self.__camera_cb)      
+        rospy.Subscriber("/text_rec", String, self.__camera_cb)      
         
+        self.__start_rec = rospy.Publisher("/text_rec_start", String)
+
         # Posición objetivos
         self.__pose = Pose()
 
@@ -215,7 +217,7 @@ class Detectar(smach.State):
         global bt0, bt1, bt2, sound, led1, led2
         
         self.__is_dir = False
-        
+        self.__start_rec.publish("start")
         
         time.sleep(0.8)
         
@@ -237,6 +239,7 @@ class Detectar(smach.State):
     def __camera_cb(self, data):        
         self.__pose = self.positions[ord(data.data) - ord('a')]
         self.__is_dir = True
+        self.__start_rec.publish("stop")
 
 
     
