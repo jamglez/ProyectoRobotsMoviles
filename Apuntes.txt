@@ -33,6 +33,10 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
     - sudo apt install ros-noetic-kobuki-controller ????
     - sudo apt install ros-noetic-dwa-local-planner
 
+    - pip3 install pytesseract
+    - sudo apt-get install libleptonica-dev tesseract-ocr tesseract-ocr-dev libtesseract-dev python3-pil tesseract-ocr-eng tesseract-ocr-script-latn
+    - pip3 install tesseract
+    - pip3 install tesseract-ocr
 
       Posiciones: 
 
