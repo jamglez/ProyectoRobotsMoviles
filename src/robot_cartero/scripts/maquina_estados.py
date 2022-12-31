@@ -126,7 +126,89 @@ class Detectar(smach.State):
         self.positions[5].position.x = 2.47
         self.positions[5].position.y = 5.73
         self.positions[5].orientation.z = 0.707
-        self.positions[5].orientation.w = 0.707        
+        self.positions[5].orientation.w = 0.707 
+
+        self.positions[6].position.x = 2.7
+        self.positions[6].position.y = 7.26
+        self.positions[6].orientation.z = -0.18
+        self.positions[6].orientation.w = 0.98
+
+        self.positions[7].position.x = 2.163
+        self.positions[7].position.y = 5.27
+        self.positions[7].orientation.z = -0.707
+        self.positions[7].orientation.w = 0.707 
+
+        self.positions[8].position.x = 1.977
+        self.positions[8].position.y = 3.41
+        self.positions[8].orientation.z = 1
+        self.positions[8].orientation.w = 0
+
+        self.positions[9].position.x = -0.03
+        self.positions[9].position.y = 3.64
+        self.positions[9].orientation.z = 0.72
+        self.positions[9].orientation.w = 0.69
+
+        self.positions[10].position.x = 0.33
+        self.positions[10].position.y = 5.726
+        self.positions[10].orientation.z = 0.0
+        self.positions[10].orientation.w = 1
+
+        self.positions[11].position.x = -0.99
+        self.positions[11].position.y = 7.33
+        self.positions[11].orientation.z = 1
+        self.positions[11].orientation.w = 0
+
+        self.positions[12].position.x = -0.996
+        self.positions[12].position.y = 5.777
+        self.positions[12].orientation.z = 0.7
+        self.positions[12].orientation.w = 0.717
+
+        self.positions[13].position.x = -1.25
+        self.positions[13].position.y = 5.23
+        self.positions[13].orientation.z = -1
+        self.positions[13].orientation.w = 0.0
+
+        self.positions[14].position.x = -2.92
+        self.positions[14].position.y = 5.08
+        self.positions[14].orientation.z = -0.711
+        self.positions[14].orientation.w = 0.702
+
+        self.positions[15].position.x = -3.286
+        self.positions[15].position.y = 3.085
+        self.positions[15].orientation.z = 1
+        self.positions[15].orientation.w = 0
+
+        self.positions[16].position.x = -3.28
+        self.positions[16].position.y = 5.405
+        self.positions[16].orientation.z = 1
+        self.positions[16].orientation.w = 0
+
+        self.positions[17].position.x = -0.97
+        self.positions[17].position.y = 7.46
+        self.positions[17].orientation.z = 0.696
+        self.positions[17].orientation.w = 0.717
+
+        self.positions[18].position.x = -5.36
+        self.positions[18].position.y = 5.55
+        self.positions[18].orientation.z = -1
+        self.positions[18].orientation.w = 0.0
+
+        self.positions[19].position.x = -6.66
+        self.positions[19].position.y = 8.04
+        self.positions[19].orientation.z = 0.71
+        self.positions[19].orientation.w = 0.698
+
+        self.positions[20].position.x = 6.73
+        self.positions[20].position.y = 1.01
+        self.positions[20].orientation.z = -0.71
+        self.positions[20].orientation.w = 0.7
+
+        self.positions[21].position.x = 4.48
+        self.positions[21].position.y = -0.15
+        self.positions[21].orientation.z = 1
+        self.positions[21].orientation.w = 0
+
+        
 
     def execute(self, userdata):
         print("------ Detectando imagen ------")
@@ -153,17 +235,8 @@ class Detectar(smach.State):
     
     # Callback del nodo de la cámara
     def __camera_cb(self, data):        
-        if data.data == "a":
-            self.__pose = self.positions[0]
-            self.__is_dir = True
-        
-        elif data.data == "b": 
-            self.__pose = self.positions[1]
-            self.__is_dir = True
-        
-        elif data.data == "c":
-            self.__pose = self.positions[2]	
-            self.__is_dir = True
+        self.__pose = self.positions[ord(data.data) - ord('a')]
+        self.__is_dir = True
 
 
     
