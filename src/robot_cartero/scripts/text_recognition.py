@@ -4,6 +4,7 @@ import rospy
 import cv2 as cv
 import pytesseract as pt
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 from cv_bridge import CvBridge
 from imutils.video import FPS
 from kobuki_msgs.msg import Sound
@@ -16,62 +17,76 @@ class text_recognizer():
         #Configuracion del reconocimiento texto de pytesseract
         self.__confg = r'--oem 3 --psm 7 outputbase digits'
         self.__count = 0
-        self.__number = 0
+        self.__number = ""
         
         # Nodo ROS
         rospy.init_node("text_recognition")
 
-        # Suscriber a los topics: 
-        rospy.Subscriber('/camera/rgb/image_raw/compressed',Image,self.__camera_callback)
-        self.__bridge = CvBridge()
-
         # Publisher en los topics:
         self.__sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10) #LED tambien?
 
+        self.__text_pub = rospy.Publisher("/text_rec", String, queue_size=10)
+        rospy.Subscriber("/text_rec_start", String, self.__start_cb)
+        self.__rec = False
+        
 
     # Comprueba el numero de mesa durante varios frames
     def __check_number(self,text):
-        for n in range(1,6):
 
-            if str(n) in text:
-                # print(n)
-                if self.__number == n:
-                        self.__count +=1
-                else:
-                    self.__number = n
-                    self.__count = 1
+        if self.__number == text and "DESTINO" in text:
+                self.__count +=1
+        else:
+            self.__number = text
+            self.__count = 1
 
+
+    def __start_cb(self, data):
+        self.__rec = data.data == "start"
 
     def webcam_test(self):
         
         fps = FPS().start()
         cap = cv.VideoCapture(0)
         cv.namedWindow('frame',cv.WINDOW_NORMAL)
-        cv.resizeWindow('frame',1280,720)
+        cv.resizeWindow('frame',640,360)
         
+        scale_percent = 50
+
         while(True):
-
-            ret, frame = cap.read()
-        
-            if ret :
-
-                data = pt.image_to_data(frame,config=self.__confg)
-                text = pt.image_to_string(frame,config=self.__confg)
-
-                frame = self.bounding_box_text(data,frame)
-
-                self.__check_number(text)
-
-                if self.__count == 3:
-                    print(f'Mesa: {self.__number}')
-                    self.__count = 0
-
-                cv.imshow('frame', frame)
             
-            fps.update()
+            if self.__rec:
+                ret, frame_ = cap.read()
+            
+                if ret :
+                    width = int(frame_.shape[1] * scale_percent / 100)
+                    height = int(frame_.shape[0] * scale_percent / 100)
+                    dim = (width, height)
 
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
+                    frame = cv.resize(frame_, dim, interpolation = cv.INTER_AREA)
+
+                    text = pt.image_to_string(frame)
+
+                    self.__check_number(text)
+
+                    if self.__count == 4:
+                        s = String()
+                        only_alpha = ""
+                        for char in text:
+                            
+                            if ord(char) >= 65 and ord(char) <= 90:
+                                only_alpha += char
+                                
+                            elif ord(char) >= 97 and ord(char) <= 122:
+                                only_alpha += char
+                        s.data = (only_alpha[-1].lower())
+                        self.__rec = False
+                        self.__text_pub.publish(s)
+                        self.__count = 0
+
+                    cv.imshow('frame', frame)
+                    cv.waitKey(1)
+            else:
+                cv.destroyAllWindows()
         
         fps.stop()
         print(f"[INFO] elapsed time {round(fps.elapsed(), 2)}")
@@ -79,40 +94,6 @@ class text_recognizer():
          
         cap.release()
         cv.destroyAllWindows()
-        
-    def __camera_callback(self,image):
-        #Hacer que deje de detectar cuando no haga falta
-
-        cv_image = self.__bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
-
-        # data = pt.image_to_data(frame)
-        # frame = self.bounding_box_text(data,frame)
-
-        text = pt.image_to_string(cv_image,config=self.__confg)
-
-        self.__check_number(text)
-
-        if self.__count == 3:
-            print(f'Mesa: {self.__number}')
-            self.__sound.publish(1)
-            self.__count = 0
-
-        cv.imshow('frame', cv_image)
-        # cv.waitKey(1)
-            
-
-    #Dibujar las bounding boxes
-    def bounding_box_text(self,data,frame):
-                        
-        for z, a in enumerate(data.splitlines()):
-            if z!= 0:
-                a = a.split()
-                if len(a) == 12:
-                    x,y,width,height  = int(a[6]), int(a[7]),int(a[8]), int (a[9])
-                    cv.rectangle(frame, (x,y), (x+width,y+height), (255,0,0), 1)
-                    cv.putText(frame, a[11], (x,y+25), cv.FONT_HERSHEY_PLAIN,1,(0,0,255),2)
-
-        return frame
 
 
 if __name__ == "__main__":
@@ -122,6 +103,3 @@ if __name__ == "__main__":
     rate = rospy.Rate(10)
 
     recognizer.webcam_test()
-
-    while not rospy.is_shutdown():
-        rate.sleep()
