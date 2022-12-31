@@ -56,7 +56,7 @@ class text_recognizer():
 
         while(True):
             
-            if True:
+            if self.__rec:
                 ret, frame_ = cap.read()
             
                 if ret :
