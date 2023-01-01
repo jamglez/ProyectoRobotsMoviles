@@ -179,6 +179,12 @@ class Detectar(smach.State):
             self.__pose = self.positions[2]	
             self.__is_dir = True
 
+        '''
+        self.__pose = self.positions[ord(data.data) - ord('a')]
+        self.__is_dir = True
+        self.__start_rec.publish("stop")
+        '''
+
     
 
 # Image leída 
