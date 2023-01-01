@@ -48,42 +48,57 @@ class text_recognizer():
     def webcam_test(self):
         
         fps = FPS().start()
-        cap = cv.VideoCapture(0)
-        cv.namedWindow('frame',cv.WINDOW_NORMAL)
+        cap = cv.VideoCapture(0)                    # Empieza la camara
+        cv.namedWindow('frame',cv.WINDOW_NORMAL)    # Ventana
         cv.resizeWindow('frame',640,360)
         
+        # Porcentaje de escala
         scale_percent = 50
 
+        # Bucle infinito
         while(True):
             
             if self.__rec:
-                ret, frame_ = cap.read()
-            
+                ret, frame_ = cap.read()            # Lee un frame de la camara 
+
+                # Si se leyó correctamente ...
                 if ret :
+                    # Reescalado del frame
                     width = int(frame_.shape[1] * scale_percent / 100)
                     height = int(frame_.shape[0] * scale_percent / 100)
                     dim = (width, height)
 
                     frame = cv.resize(frame_, dim, interpolation = cv.INTER_AREA)
 
+                    # Transforma la imagen a texto
                     text = pt.image_to_string(frame)
 
+                    # Comprueba si se repitió el texto
                     self.__check_number(text)
 
+                    # Si el texto se repitio mas que un umbral, construye y envíe el mensaje 
                     if self.__count == 4:
-                        s = String()
+                        s = String()        # Mensaje
                         only_alpha = ""
+
+                        # Obtiene solo el texto 
                         for char in text:
-                            
                             if ord(char) >= 65 and ord(char) <= 90:
                                 only_alpha += char
                                 
                             elif ord(char) >= 97 and ord(char) <= 122:
                                 only_alpha += char
+
+                        # Convierte a minusucula solo la ultima letra
                         s.data = (only_alpha[-1].lower())
+
+                        # Deja de detectar y reinicia la cuenta
                         self.__rec = False
-                        self.__text_pub.publish(s)
                         self.__count = 0
+                        
+                        # Envía el mensaje
+                        self.__text_pub.publish(s)
+                        
 
                     cv.imshow('frame', frame)
                     cv.waitKey(1)
