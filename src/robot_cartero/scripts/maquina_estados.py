@@ -99,6 +99,7 @@ class Detectar(smach.State):
         # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
         rospy.Subscriber("/teclas", String, self.__camera_cb)      
         
+
         # Mensaje de Pose
         self.__pose = Pose()
 
