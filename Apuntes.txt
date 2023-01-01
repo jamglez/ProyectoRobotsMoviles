@@ -4,6 +4,9 @@ Ver la cámara: rqt_image_view
 Arm: roslaunch phantomx_reactor_arm_controller arbotix_phantomx_reactor_arm_wrist.launch
 	       turtlebot_arm_bringup arm.launch
 
+
+
+
 ---------------------------------------------
 
 	Para cargar el modelo del mundo guardado en Gazebo, ir al menú de la izquierda de la simulación. En la pestaña "Insert" seleccionar el paquete que corresponda con el del mundo deseado.
@@ -22,20 +25,18 @@ En nuestro caso, habría que añadir al path la ruta de la carpeta "Clase" y "Cl
   - Tutorial de SLAM (generar mapa): https://emanual.robotis.com/docs/en/platform/turtlebot3/slam_simulation/
   - Ejemplo de publicar en topic de goal: https://gist.github.com/Coderx7/e190d05a12db87f2bc3bd82c03545d75
   - SMACH: http://wiki.ros.org/smach/Tutorials/Getting%20Started
-  - Generar mundo de Gazebo a partir de PGM: https://github.com/shilohc/map2gazebo
-      pip install --user trimesh
-      pip install --user numpy
-      pip install --user pycollada
-      pip install --user scipy
-      pip install --user networkx
-
+ 
   - Instalaciones:
-    sudo apt-get install ros-noetic-ecl-exceptions
-    sudo apt-get install ros-noetic-ecl-threads
-    sudo apt-get install ros-noetic-openslam-gmapping
-    sudo apt-get install ros-noetic-joy
-    sudo apt-get install ros-noetic-kobuki-driver
-    sudo apt-get install ros-noetic-ecl-streams
+    - sudo apt install ros-noetic-amcl
+    - sudo apt install ros-noetic-move-base
+    - sudo apt install ros-noetic-map-server
+    - sudo apt install ros-noetic-kobuki-controller ????
+    - sudo apt install ros-noetic-dwa-local-planner
+
+    - pip3 install pytesseract
+    - sudo apt-get install libleptonica-dev tesseract-ocr tesseract-ocr-dev libtesseract-dev python3-pil tesseract-ocr-eng tesseract-ocr-script-latn
+    - pip3 install tesseract
+    - pip3 install tesseract-ocr
 
       Posiciones: 
 
