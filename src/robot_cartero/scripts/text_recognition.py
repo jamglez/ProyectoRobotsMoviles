@@ -15,7 +15,6 @@ class text_recognizer():
     def __init__(self) -> None:
 
         #Configuracion del reconocimiento texto de pytesseract
-        self.__confg = r'--oem 3 --psm 7 outputbase digits'
         self.__count = 0
         self.__number = ""
         
