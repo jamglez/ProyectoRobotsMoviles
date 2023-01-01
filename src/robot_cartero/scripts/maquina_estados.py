@@ -97,8 +97,9 @@ class Detectar(smach.State):
                              output_keys=['direccion_out'])
         
         # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
-        rospy.Subscriber("/teclas", String, self.__camera_cb)      
+        rospy.Subscriber("/text_rec", String, self.__camera_cb)      
         
+        self.__start_rec = rospy.Publisher("/text_rec_start", String)
 
         # Mensaje de Pose
         self.__pose = Pose()
@@ -141,6 +142,8 @@ class Detectar(smach.State):
         print("------ Detectando imagen ------")
         global bt0, bt1, bt2, sound, led1, led2
         
+        self.__start_rec.publish("start")
+
         # Enciende leds en naranja y emite sonido
         led1.publish(2)
         led2.publish(2)
@@ -151,7 +154,7 @@ class Detectar(smach.State):
         # Hasta que detecte una imagen o se pulse el botón no cambia de estado
         while not rospy.is_shutdown():
             if self.__is_dir == True:
-                
+                self.__start_rec.publish("stop")
                 # Se pasa la dirección al siguiente estado
                 userdata.direccion_out = self.__pose            	
                 self.__is_dir = False
