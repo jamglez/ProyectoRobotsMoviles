@@ -232,6 +232,7 @@ class Detectar(smach.State):
                 return 'outcome1'
             	 
             elif bt1 == True:
+                self.__start_rec.publish("stop")
                 bt1 = False
                 return 'outcome2'
     
