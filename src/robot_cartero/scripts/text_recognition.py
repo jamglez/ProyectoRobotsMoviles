@@ -8,6 +8,7 @@ from std_msgs.msg import String
 from cv_bridge import CvBridge
 from imutils.video import FPS
 from kobuki_msgs.msg import Sound
+import time
 # import keras_ocr
 
 class text_recognizer():
@@ -28,6 +29,7 @@ class text_recognizer():
         rospy.Subscriber("/text_rec_start", String, self.__start_cb)
         self.__rec = False
         self.destroy = False
+        self.first_rec= False
         
 
     # Comprueba el numero de mesa durante varios frames
@@ -42,6 +44,7 @@ class text_recognizer():
 
     def __start_cb(self, data):
         self.__rec = data.data == "start"
+        self.first_rec = True
         self.destroy = True
 
     def webcam_test(self):
@@ -53,7 +56,7 @@ class text_recognizer():
         
         # Porcentaje de escala
         scale_percent = 50
-
+        count = 0
         # Bucle infinito
         while(True):
             
@@ -69,35 +72,42 @@ class text_recognizer():
 
                     frame = cv.resize(frame_, dim, interpolation = cv.INTER_AREA)
 
-                    # Transforma la imagen a texto
-                    text = pt.image_to_string(frame)
+                    if not self.first_rec:
+                        count = 0
+                        # Transforma la imagen a texto
+                        text = pt.image_to_string(frame)
 
-                    # Comprueba si se repitió el texto
-                    self.__check_number(text)
+                        # Comprueba si se repitió el texto
+                        self.__check_number(text)
 
-                    # Si el texto se repitio mas que un umbral, construye y envíe el mensaje 
-                    if self.__count == 4:
-                        s = String()        # Mensaje
-                        only_alpha = ""
+                        # Si el texto se repitio mas que un umbral, construye y envíe el mensaje 
+                        if self.__count == 2:
+                            s = String()        # Mensaje
+                            only_alpha = ""
 
-                        # Obtiene solo el texto 
-                        for char in text:
-                            if ord(char) >= 65 and ord(char) <= 90:
-                                only_alpha += char
-                                
-                            elif ord(char) >= 97 and ord(char) <= 122:
-                                only_alpha += char
+                            # Obtiene solo el texto 
+                            for char in text:
+                                if ord(char) >= 65 and ord(char) <= 90:
+                                    only_alpha += char
+                                    
+                                elif ord(char) >= 97 and ord(char) <= 122:
+                                    only_alpha += char
 
-                        # Convierte a minusucula solo la ultima letra
-                        s.data = (only_alpha[-1].lower())
+                            # Convierte a minusucula solo la ultima letra
+                            s.data = (only_alpha[-1].lower())
 
-                        # Deja de detectar y reinicia la cuenta
-                        self.__rec = False
-                        self.__count = 0
+                            # Deja de detectar y reinicia la cuenta
+                            self.__rec = False
+                            self.__count = 0
+                            
+                            # Envía el mensaje
+                            self.__text_pub.publish(s)
+                    else:
+                        count = count + 1
                         
-                        # Envía el mensaje
-                        self.__text_pub.publish(s)
-                        
+                        if count == 20:
+                            self.first_rec = False
+                    
 
                     cv.imshow('frame', frame)
                     cv.waitKey(1)
