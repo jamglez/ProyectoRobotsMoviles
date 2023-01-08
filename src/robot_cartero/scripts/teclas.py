@@ -32,8 +32,5 @@ def callback(tecla):
 
 
 # Main
-if __name__ == '__main__':
-    
-    
-    print("------- Start --------")
+if __name__ == '__main__':    
     kb.Listener(callback).run()
