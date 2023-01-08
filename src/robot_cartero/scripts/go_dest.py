@@ -37,7 +37,7 @@ def go_pose(data):
     client.wait_for_server()    # Espera al servido
 
     goal = move_base_msgs.msg.MoveBaseGoal(data)
-    print(goal)
+    # print(goal)
     
     # Envía el goal y espera el resultado
     client.send_goal(goal, feedback_cb=cb)
