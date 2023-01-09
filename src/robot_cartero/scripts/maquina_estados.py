@@ -289,7 +289,7 @@ class Ir_destino(smach.State):
         
         # Crea el mensaje
         desiredPose = PoseStamped()
-        desiredPose.header.frame_id = "cartero"
+        desiredPose.header.frame_id = "map"
         desiredPose.pose = userdata.direccion_in
         
         # Publica el mensaje
