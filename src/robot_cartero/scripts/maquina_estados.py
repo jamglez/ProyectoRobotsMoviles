@@ -37,7 +37,7 @@ go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)           
 arm = rospy.Publisher("/arm", String, queue_size=10)                            # Publisher para el nodo del brazo
 
 # Tiempo de espera
-wait_time = 1
+wait_time = 8
 
 
 # Reposo
@@ -96,7 +96,6 @@ class Detectar(smach.State):
                              outcomes=['outcome1','outcome2'],
                              output_keys=['direccion_out'])
         
-        # TODO: ###################### CAMBIAR EL TOPIC DE LAS TECLAS POR EL DE LA CÁMARA #########################
         rospy.Subscriber("/text_rec", String, self.__camera_cb)      
         
         self.__start_rec = rospy.Publisher("/text_rec_start", String)
