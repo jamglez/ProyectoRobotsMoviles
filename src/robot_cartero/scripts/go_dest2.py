@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import rospy
 import actionlib
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal, MoveBaseActionGoal
 from actionlib_msgs.msg import GoalStatus
 import sys
 
@@ -21,16 +21,19 @@ class ClienteMoveBase:
 
     def moveTo(self, x, y):
         #un MoveBaseGoal es un punto objetivo al que nos queremos mover
-        goal = MoveBaseGoal()
+        goal = MoveBaseActionGoal()
         #sistema de referencia que estamos usando
-        goal.target_pose.header.frame_id = "map"
-        goal.target_pose.pose.position.x = x   
-        goal.target_pose.pose.position.y = y
+        goal.goal.target_pose.header.frame_id = "map"
+        goal.goal.target_pose.pose.position.x = x   
+        goal.goal.target_pose.pose.position.y = y
         #La orientación es un quaternion. Tenemos que fijar alguno de sus componentes
-        goal.target_pose.pose.orientation.w = 1.0
+        goal.goal.target_pose.pose.orientation.w = 1.0
 
         #enviamos el goal 
-        self.client.send_goal(goal)
+        # self.client.send_goal(goal)
+        pb = rospy.Publisher("/move_base/goal", MoveBaseActionGoal)
+        pb.publish(goal)
+        
         #vamos a comprobar cada cierto tiempo si se ha cumplido el goal
         #get_state obtiene el resultado de la acción 
         state = self.client.get_state()
