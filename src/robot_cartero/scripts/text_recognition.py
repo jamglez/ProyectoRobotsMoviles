@@ -4,74 +4,122 @@ import rospy
 import cv2 as cv
 import pytesseract as pt
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 from cv_bridge import CvBridge
 from imutils.video import FPS
 from kobuki_msgs.msg import Sound
+import time
 # import keras_ocr
+
+count = 0
 
 class text_recognizer():
     
     def __init__(self) -> None:
 
         #Configuracion del reconocimiento texto de pytesseract
-        self.__confg = r'--oem 3 --psm 7 outputbase digits'
         self.__count = 0
-        self.__number = 0
+        self.__number = ""
         
+        rospy.Subscriber("/camera/rgb/image_raw", Image, self.__camera_callback)
+        self.__bridge = CvBridge()
+
         # Nodo ROS
         rospy.init_node("text_recognition")
-
-        # Suscriber a los topics: 
-        rospy.Subscriber('/camera/rgb/image_raw/compressed',Image,self.__camera_callback)
-        self.__bridge = CvBridge()
 
         # Publisher en los topics:
         self.__sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10) #LED tambien?
 
+        self.__text_pub = rospy.Publisher("/text_rec", String, queue_size=10)
+        rospy.Subscriber("/text_rec_start", String, self.__start_cb)
+        self.__rec = False
+        self.destroy = False
+        self.first_rec= False
+        
 
     # Comprueba el numero de mesa durante varios frames
     def __check_number(self,text):
-        for n in range(1,6):
 
-            if str(n) in text:
-                # print(n)
-                if self.__number == n:
-                        self.__count +=1
-                else:
-                    self.__number = n
-                    self.__count = 1
+        if self.__number == text and "DESTINO" in text:
+                self.__count +=1
+        else:
+            self.__number = text
+            self.__count = 1
 
+
+    def __start_cb(self, data):
+        self.__rec = data.data == "start"
+        self.first_rec = True
+        self.destroy = True
 
     def webcam_test(self):
         
         fps = FPS().start()
-        cap = cv.VideoCapture(0)
-        cv.namedWindow('frame',cv.WINDOW_NORMAL)
-        cv.resizeWindow('frame',1280,720)
+        cap = cv.VideoCapture(0)                    # Empieza la camara
+        cv.namedWindow('frame',cv.WINDOW_NORMAL)    # Ventana
+        cv.resizeWindow('frame',640,360)
         
+        # Porcentaje de escala
+        scale_percent = 50
+        count = 0
+        # Bucle infinito
         while(True):
-
-            ret, frame = cap.read()
-        
-            if ret :
-
-                data = pt.image_to_data(frame,config=self.__confg)
-                text = pt.image_to_string(frame,config=self.__confg)
-
-                frame = self.bounding_box_text(data,frame)
-
-                self.__check_number(text)
-
-                if self.__count == 3:
-                    print(f'Mesa: {self.__number}')
-                    self.__count = 0
-
-                cv.imshow('frame', frame)
             
-            fps.update()
+            if self.__rec:
+                ret, frame_ = cap.read()            # Lee un frame de la camara 
 
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
+                # Si se leyó correctamente ...
+                if ret :
+                    # Reescalado del frame
+                    width = int(frame_.shape[1] * scale_percent / 100)
+                    height = int(frame_.shape[0] * scale_percent / 100)
+                    dim = (width, height)
+
+                    frame = cv.resize(frame_, dim, interpolation = cv.INTER_AREA)
+
+                    if not self.first_rec:
+                        count = 0
+                        # Transforma la imagen a texto
+                        text = pt.image_to_string(frame)
+
+                        # Comprueba si se repitió el texto
+                        self.__check_number(text)
+
+                        # Si el texto se repitio mas que un umbral, construye y envíe el mensaje 
+                        if self.__count == 2:
+                            s = String()        # Mensaje
+                            only_alpha = ""
+
+                            # Obtiene solo el texto 
+                            for char in text:
+                                if ord(char) >= 65 and ord(char) <= 90:
+                                    only_alpha += char
+                                    
+                                elif ord(char) >= 97 and ord(char) <= 122:
+                                    only_alpha += char
+
+                            # Convierte a minusucula solo la ultima letra
+                            s.data = (only_alpha[-1].lower())
+
+                            # Deja de detectar y reinicia la cuenta
+                            self.__rec = False
+                            self.__count = 0
+                            
+                            # Envía el mensaje
+                            self.__text_pub.publish(s)
+                    else:
+                        count = count + 1
+                        
+                        if count == 20:
+                            self.first_rec = False
+                    
+
+                    cv.imshow('frame', frame)
+                    cv.waitKey(1)
+            else:
+                if self.destroy:
+                    cv.destroyAllWindows()
+                    self.destroy = False
         
         fps.stop()
         print(f"[INFO] elapsed time {round(fps.elapsed(), 2)}")
@@ -79,41 +127,47 @@ class text_recognizer():
          
         cap.release()
         cv.destroyAllWindows()
-        
-    def __camera_callback(self,image):
-        #Hacer que deje de detectar cuando no haga falta
 
-        cv_image = self.__bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
 
-        # data = pt.image_to_data(frame)
-        # frame = self.bounding_box_text(data,frame)
+    def __camera_callback(self, image):
+        global count
+        frame = self.__bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
 
-        text = pt.image_to_string(cv_image,config=self.__confg)
+        text = pt.image_to_string(frame)
 
+        # Comprueba si se repitió el texto
         self.__check_number(text)
 
-        if self.__count == 3:
-            print(f'Mesa: {self.__number}')
-            self.__sound.publish(1)
+        # Si el texto se repitio mas que un umbral, construye y envíe el mensaje 
+        if self.__count == 2:
+            s = String()        # Mensaje
+            only_alpha = ""
+
+            # Obtiene solo el texto 
+            for char in text:
+                if ord(char) >= 65 and ord(char) <= 90:
+                    only_alpha += char
+                    
+                elif ord(char) >= 97 and ord(char) <= 122:
+                    only_alpha += char
+
+            # Convierte a minusucula solo la ultima letra
+            s.data = (only_alpha[-1].lower())
+
+            # Deja de detectar y reinicia la cuenta
+            self.__rec = False
             self.__count = 0
-
-        cv.imshow('frame', cv_image)
-        # cv.waitKey(1)
             
+            # Envía el mensaje
+            self.__text_pub.publish(s)
+        else:
+            count = count + 1
+        
+            if count == 20:
+                self.first_rec = False
 
-    #Dibujar las bounding boxes
-    def bounding_box_text(self,data,frame):
-                        
-        for z, a in enumerate(data.splitlines()):
-            if z!= 0:
-                a = a.split()
-                if len(a) == 12:
-                    x,y,width,height  = int(a[6]), int(a[7]),int(a[8]), int (a[9])
-                    cv.rectangle(frame, (x,y), (x+width,y+height), (255,0,0), 1)
-                    cv.putText(frame, a[11], (x,y+25), cv.FONT_HERSHEY_PLAIN,1,(0,0,255),2)
-
-        return frame
-
+        cv.imshow('frame', frame)
+        cv.waitKey(1)
 
 if __name__ == "__main__":
 
@@ -121,7 +175,7 @@ if __name__ == "__main__":
 
     rate = rospy.Rate(10)
 
-    recognizer.webcam_test()
+    # recognizer.webcam_test()
 
     while not rospy.is_shutdown():
-        rate.sleep()
+        pass
