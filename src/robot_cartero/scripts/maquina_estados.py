@@ -21,12 +21,19 @@ bt2 = False
 def button_cb(data):
     global bt0, bt1, bt2
     
-    if data.button == 0:
-        bt0 = True
-    elif data.button == 1:
-        bt1 = True
-    elif data.button == 2:
-        bt2 = True
+    if data.state == 1:
+        if data.button == 0:
+            bt0 = True
+            bt1 = False
+            bt2 = False
+        elif data.button == 1:
+            bt1 = True
+            bt0 = False
+            bt2 = False
+        elif data.button == 2:
+            bt2 = True
+            bt0 = False
+            bt1 = False
     
 # Publishers y subscribers de los elementos del botón
 rospy.Subscriber("/mobile_base/events/button", ButtonEvent, button_cb)          # Subscriber de los botones
@@ -34,10 +41,10 @@ led1 = rospy.Publisher("/mobile_base/commands/led1", Led, queue_size=10)        
 led2 = rospy.Publisher("/mobile_base/commands/led2", Led, queue_size=10)        
 sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10)    # Publisher del sonido
 go_pose_pub = rospy.Publisher("/go_pose", PoseStamped, queue_size=10)           # Publisher para el nodo de /go_pose
-arm = rospy.Publisher("/arm", String, queue_size=10)                            # Publisher para el nodo del brazo
+arm = rospy.Publisher("/arm_controller", String, queue_size=10)                            # Publisher para el nodo del brazo
 
 # Tiempo de espera
-wait_time = 8
+wait_time = 5
 
 
 # Reposo
@@ -98,7 +105,7 @@ class Detectar(smach.State):
         
         rospy.Subscriber("/text_rec", String, self.__camera_cb)      
         
-        self.__start_rec = rospy.Publisher("/text_rec_start", String)
+        self.__start_rec = rospy.Publisher("/text_rec_start", String, queue_size=10)
 
         # Mensaje de Pose
         self.__pose = Pose()
@@ -111,29 +118,29 @@ class Detectar(smach.State):
         for i in range(3):
             self.positions.append(Pose())
         
-        self.positions[0].position.x = 0.925
-        self.positions[0].position.y = 1.848
+        self.positions[0].position.x = 3.6
+        self.positions[0].position.y = 1.8
         
         self.positions[0].orientation.x = 0.0
         self.positions[0].orientation.y = 0.0
         self.positions[0].orientation.z = 0.875
         self.positions[0].orientation.w = 0.484
         
-        self.positions[1].position.x = 1.698
-        self.positions[1].position.y = 2.1999
+        self.positions[1].position.x = 4.3
+        self.positions[1].position.y = 0.6
         
         self.positions[1].orientation.x = 0.0
         self.positions[1].orientation.y = 0.0
         self.positions[1].orientation.z = 0.461
         self.positions[1].orientation.w = 0.887
 
-        self.positions[2].position.x = 2.0999951362609863
-        self.positions[2].position.y = 3.279998540878296
+        self.positions[2].position.x = 4.3
+        self.positions[2].position.y = 0.6
         
         self.positions[2].orientation.x = 0.0
         self.positions[2].orientation.y = 0.0
-        self.positions[2].orientation.z = -0.998
-        self.positions[2].orientation.w = 0.05
+        self.positions[2].orientation.z = 0
+        self.positions[2].orientation.w = 1
         
         
 
@@ -355,6 +362,7 @@ class Recogida(smach.State):
                 arm.publish("soltar")       # Sujeto a cambios
                 time.sleep(wait_time)
 
+                print("Entregado")
                 # Pasa la posición anterior al movimiento al siguiente estado
                 userdata.prev_direccion_out = userdata.prev_direccion_in
 
@@ -418,7 +426,7 @@ def main():
                                remapping={'prev_direccion_in':'pose',
                                           'prev_direccion_out':'pose'})
 
-
+    outcome = sm.execute()
 # Main
 if __name__ == '__main__':
     main()
