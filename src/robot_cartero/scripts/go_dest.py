@@ -57,21 +57,18 @@ def go_pose(data):
     print(goal)
     
     # Envía el goal y espera el resultado
-    # client.send_goal(goal, feedback_cb=cb)
-    # client.wait_for_result()
-    
     pub_pose.publish(goal)
 
     while not end:
         pass
 
-    end = False
     # Al acabar, envia la posición anterior a través del topic
     pub.publish(prev_pose)
     
     # Reinicia las variables
     prev_pose = Pose()
     get_prev_pose = False
+    end = False
     
 # Suscriptor al topic donde se envian las posiciones objetivos
 rospy.Subscriber("/go_pose", PoseStamped, go_pose)
