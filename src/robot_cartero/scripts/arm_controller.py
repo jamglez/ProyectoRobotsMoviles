@@ -39,7 +39,7 @@ class arm_controller():
 
     def extend_arm(self):
         self._shoulder.publish(-1)
-        #self._elbow.publish(0.8)
+        #self._elbow.publish(0.4)
         self._wrist.publish(-1)
 
     def retract_arm(self):
