@@ -5,8 +5,4 @@
     <node name="go_dest" pkg="robot_cartero" type="go_dest.py" output="screen" />
     <node name="text" pkg="robot_cartero" type="text_recognition.py" output="screen" />
     <node name="arm" pkg="robot_cartero" type="arm_controller.py" output="screen" />
-
-    <group if="$(eval arg('mode') == 'tiles')">
-        <node name="tiles" pkg="robot_cartero" type="teclas.py" output="screen" />
-    </group>
 </launch>
