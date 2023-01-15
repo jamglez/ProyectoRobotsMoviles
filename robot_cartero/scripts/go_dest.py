@@ -29,8 +29,9 @@ def cb(data):
             prev_pose = data.feedback.base_position.pose     # Se almacena la posición
 
 
+# Callback para el fin de la acción
 def cb_result(data):
-    global end
+    global end      
 
     end = True
 
@@ -45,11 +46,10 @@ def go_pose(data):
 
     goal = move_base_msgs.msg.MoveBaseActionGoal()
 
-    goal.goal.target_pose.header.frame_id = "map"
+    # Se crea el goal a partir del mensaje del callback
     goal.goal.target_pose.header.frame_id = "map"
     goal.goal.target_pose.pose.position.x = data.pose.position.x
     goal.goal.target_pose.pose.position.y = data.pose.position.y
-    #La orientación es un quaternion. Tenemos que fijar alguno de sus componentes
 
     goal.goal.target_pose.pose.orientation.z = data.pose.orientation.z
     goal.goal.target_pose.pose.orientation.w = data.pose.orientation.w
@@ -59,6 +59,7 @@ def go_pose(data):
     # Envía el goal y espera el resultado
     pub_pose.publish(goal)
 
+    # Espera al fin de la acción
     while not end:
         pass
 
