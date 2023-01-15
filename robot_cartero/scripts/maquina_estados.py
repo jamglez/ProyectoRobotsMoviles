@@ -118,29 +118,181 @@ class Detectar(smach.State):
         for i in range(3):
             self.positions.append(Pose())
         
-        self.positions[0].position.x = 3.6
-        self.positions[0].position.y = 1.8
+        self.positions[0].position.x = 0.47
+        self.positions[0].position.y = 0.24
         
         self.positions[0].orientation.x = 0.0
         self.positions[0].orientation.y = 0.0
-        self.positions[0].orientation.z = 0.875
-        self.positions[0].orientation.w = 0.484
+        self.positions[0].orientation.z = 0.0
+        self.positions[0].orientation.w = 1
         
-        self.positions[1].position.x = 4.3
-        self.positions[1].position.y = 0.6
+        self.positions[1].position.x = 1.0
+        self.positions[1].position.y = 1.7
         
         self.positions[1].orientation.x = 0.0
         self.positions[1].orientation.y = 0.0
-        self.positions[1].orientation.z = 0.461
-        self.positions[1].orientation.w = 0.887
+        self.positions[1].orientation.z = 0.0
+        self.positions[1].orientation.w = 1
 
-        self.positions[2].position.x = 4.3
-        self.positions[2].position.y = 0.6
+        self.positions[2].position.x = -0.46
+        self.positions[2].position.y = 2.84
         
         self.positions[2].orientation.x = 0.0
         self.positions[2].orientation.y = 0.0
         self.positions[2].orientation.z = 0
         self.positions[2].orientation.w = 1
+
+        self.positions[3].position.x = 2.45
+        self.positions[3].position.y = -0.84
+        
+        self.positions[3].orientation.x = 0.0
+        self.positions[3].orientation.y = 0.0
+        self.positions[3].orientation.z = 0.0
+        self.positions[3].orientation.w = 1
+        
+        self.positions[4].position.x = 2.76
+        self.positions[4].position.y = 1.43
+        
+        self.positions[4].orientation.x = 0.0
+        self.positions[4].orientation.y = 0.0
+        self.positions[4].orientation.z = 0
+        self.positions[4].orientation.w = 1
+
+        self.positions[5].position.x = 3.6
+        self.positions[5].position.y = 1.17
+        
+        self.positions[5].orientation.x = 0.0
+        self.positions[5].orientation.y = 0.0
+        self.positions[5].orientation.z = 0
+        self.positions[5].orientation.w = 1
+
+        self.positions[6].position.x = 3.95
+        self.positions[6].position.y = -0.39
+        
+        self.positions[6].orientation.x = 0.0
+        self.positions[6].orientation.y = 0.0
+        self.positions[6].orientation.z = 0.0
+        self.positions[6].orientation.w = 1
+        
+        self.positions[7].position.x = 1.1
+        self.positions[7].position.y = 2.66
+        
+        self.positions[7].orientation.x = 0.0
+        self.positions[7].orientation.y = 0.0
+        self.positions[7].orientation.z = 0
+        self.positions[7].orientation.w = 1
+
+        self.positions[8].position.x = 0.82
+        self.positions[8].position.y = 4.16
+        
+        self.positions[8].orientation.x = 0.0
+        self.positions[8].orientation.y = 0.0
+        self.positions[8].orientation.z = 0
+        self.positions[8].orientation.w = 1
+
+        self.positions[9].position.x = 2.68
+        self.positions[9].position.y = 4.41
+        
+        self.positions[9].orientation.x = 0.0
+        self.positions[9].orientation.y = 0.0
+        self.positions[9].orientation.z = 0
+        self.positions[9].orientation.w = 1
+        
+        self.positions[10].position.x = 3.12
+        self.positions[10].position.y = 2.98
+        
+        self.positions[10].orientation.x = 0.0
+        self.positions[10].orientation.y = 0.0
+        self.positions[10].orientation.z = 0
+        self.positions[10].orientation.w = 1
+
+        self.positions[11].position.x = 5.64
+        self.positions[11].position.y = 1
+        
+        self.positions[11].orientation.x = 0.0
+        self.positions[11].orientation.y = 0.0
+        self.positions[11].orientation.z = 0
+        self.positions[11].orientation.w = 1
+
+        self.positions[12].position.x = 5.17
+        self.positions[12].position.y = 1.156
+        
+        self.positions[12].orientation.x = 0.0
+        self.positions[12].orientation.y = 0.0
+        self.positions[12].orientation.z = 0
+        self.positions[12].orientation.w = 1
+        
+        self.positions[13].position.x = 4.5
+        self.positions[13].position.y = 2.55
+        
+        self.positions[13].orientation.x = 0.0
+        self.positions[13].orientation.y = 0.0
+        self.positions[13].orientation.z = 0
+        self.positions[13].orientation.w = 1
+
+        self.positions[14].position.x = 3.6
+        self.positions[14].position.y = 4.5
+        
+        self.positions[14].orientation.x = 0.0
+        self.positions[14].orientation.y = 0.0
+        self.positions[14].orientation.z = 0
+        self.positions[14].orientation.w = 1
+        
+        self.positions[15].position.x = 3
+        self.positions[15].position.y = 6.13
+        
+        self.positions[15].orientation.x = 0.0
+        self.positions[15].orientation.y = 0.0
+        self.positions[15].orientation.z = 0
+        self.positions[15].orientation.w = 1
+        
+        self.positions[16].position.x = 4.23
+        self.positions[16].position.y = 4.3
+        
+        self.positions[16].orientation.x = 0.0
+        self.positions[16].orientation.y = 0.0
+        self.positions[16].orientation.z = 0.0
+        self.positions[16].orientation.w = 1
+
+        self.positions[17].position.x = 4.47
+        self.positions[17].position.y = -0.7
+        
+        self.positions[17].orientation.x = 0.0
+        self.positions[17].orientation.y = 0.0
+        self.positions[17].orientation.z = 0
+        self.positions[17].orientation.w = 1
+
+        self.positions[18].position.x = 6.61
+        self.positions[18].position.y = 4.4
+        
+        self.positions[18].orientation.x = 0.0
+        self.positions[18].orientation.y = 0.0
+        self.positions[18].orientation.z = 0.0
+        self.positions[18].orientation.w = 1
+        
+        self.positions[19].position.x = 6.61
+        self.positions[19].position.y = 4.4
+        
+        self.positions[19].orientation.x = 0.0
+        self.positions[19].orientation.y = 0.0
+        self.positions[19].orientation.z = 0.0
+        self.positions[19].orientation.w = 1
+
+        self.positions[20].position.x = -2.82
+        self.positions[20].position.y = 6.02
+        
+        self.positions[20].orientation.x = 0.0
+        self.positions[20].orientation.y = 0.0
+        self.positions[20].orientation.z = 0
+        self.positions[20].orientation.w = 1
+
+        self.positions[21].position.x = -0.75
+        self.positions[21].position.y = 7.53
+        
+        self.positions[21].orientation.x = 0.0
+        self.positions[21].orientation.y = 0.0
+        self.positions[21].orientation.z = 0.0
+        self.positions[21].orientation.w = 1
         
         
 
@@ -173,23 +325,11 @@ class Detectar(smach.State):
     
     # Callback de la cámara
     def __camera_cb(self, data):        
-        if data.data == "a":
-            self.__pose = self.positions[0]
-            self.__is_dir = True
         
-        elif data.data == "b": 
-            self.__pose = self.positions[1]
-            self.__is_dir = True
-        
-        elif data.data == "c":
-            self.__pose = self.positions[2]	
-            self.__is_dir = True
-
-        '''
         self.__pose = self.positions[ord(data.data) - ord('a')]
         self.__is_dir = True
         self.__start_rec.publish("stop")
-        '''
+        
 
     
 
