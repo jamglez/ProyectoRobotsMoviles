@@ -18,15 +18,6 @@ def callback(tecla):
            
     elif(str(tecla) == "'2'"):
         s.data = "2"
-        
-    elif(str(tecla) == "'a'"):
-        s.data = "a"
-        
-    elif(str(tecla) == "'b'"):
-        s.data = "b"
-           
-    elif(str(tecla) == "'c'"):
-        s.data = "c"
 
     pub.publish(s)
 
