@@ -22,9 +22,6 @@ class text_recognizer():
         # Nodo ROS
         rospy.init_node("text_recognition")
 
-        # Publisher en los topics:
-        self.__sound = rospy.Publisher("/mobile_base/commands/sound", Sound, queue_size=10) #LED tambien?
-
         self.__text_pub = rospy.Publisher("/text_rec", String, queue_size=10)
         rospy.Subscriber("/text_rec_start", String, self.__start_cb)
         self.__rec = False
@@ -47,6 +44,7 @@ class text_recognizer():
         self.first_rec = True
         self.destroy = True
 
+    # Aplica el algoritmo con capturas de la webcam
     def webcam_test(self):
         
         fps = FPS().start()
